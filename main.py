@@ -1,8 +1,20 @@
+'''
+Description: 简约 pdf 阅读器
+Version: 1.0
+Author: Glenn
+Email: chenluda01@outlook.com
+Date: 2023-05-24 09:27:56
+FilePath: \20-pdf\main.py
+Copyright (c) 2023 by Kust-BME, All Rights Reserved. 
+'''
 import sys
 import fitz
+import cv2
+import numpy as np
+import pytesseract
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QFileDialog, QScrollArea, QLineEdit, QAction, QWidget, QStatusBar, QSpacerItem, QSizePolicy
 from PyQt5.QtGui import QPixmap, QImage, QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPoint
 
 # 定义PDF阅读器类
 class PDFReader(QMainWindow):
@@ -15,8 +27,8 @@ class PDFReader(QMainWindow):
         self.current_match = -1  # 当前显示的搜索结果的索引
         self.manual_scroll = False  # 是否正在手动翻页
         self.initUI()  # 初始化用户界面
+        self.page_text_boxes = {}  # 存储当前页面的文本框
 
-    # 初始化用户界面的函数
     def initUI(self):
         # 设置窗口标题和初始位置、大小
         self.setWindowTitle('PDF Reader')
@@ -105,9 +117,27 @@ class PDFReader(QMainWindow):
             zoom_y = 2.0
             mat = fitz.Matrix(zoom_x, zoom_y)
             pix = self.page.get_pixmap(matrix=mat)
+
+            if self.page_num not in self.page_text_boxes:
+                img = np.frombuffer(pix.samples, np.uint8).reshape(pix.h, pix.w, pix.n)
+                self.page_text_boxes[self.page_num] = self.detect_text(img)
+
             img = QImage(pix.samples, pix.width, pix.height, pix.stride, QImage.Format_RGB888)
             self.page_label.setPixmap(QPixmap.fromImage(img))
             self.page_num_label.setText(f'Page {self.page_num + 1} of {len(self.pdf)}')
+    
+    # 用于检测图片中的文本
+    def detect_text(self, image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        _, threshold = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        data = pytesseract.image_to_data(threshold, output_type=pytesseract.Output.DICT)
+        text_boxes = {}
+        for i in range(len(data["text"])):
+            text = data["text"][i]
+            x, y, w, h = data["left"][i], data["top"][i], data["width"][i], data["height"][i]
+            if text.strip():  # 去除空格
+                text_boxes[text] = (x, y, x + w, y + h)
+        return text_boxes
 
     # 显示上一个和下一个页面的函数
     def prev_page(self):
