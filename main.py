@@ -21,6 +21,7 @@ class PDFReader(QMainWindow):
         # 设置窗口标题和初始位置、大小
         self.setWindowTitle('PDF Reader')
         self.setGeometry(100, 100, 800, 600)
+        self.setWindowIcon(QIcon('./images/logo.png'))
 
         # 创建一个窗口小部件并设为主窗口小部件
         widget = QWidget()
