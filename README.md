@@ -1,5 +1,5 @@
 # GlennPDF
-简约 pdf 阅读器
+深渊巨坑：基于 pyqt 的简约 pdf 阅读器
 
 2023-05-25 10:33:51 updata main.py：添加检测图片文本功能
 
