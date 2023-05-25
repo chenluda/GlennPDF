@@ -118,8 +118,10 @@ class PDFReader(QMainWindow):
             mat = fitz.Matrix(zoom_x, zoom_y)
             pix = self.page.get_pixmap(matrix=mat)
 
+            # 检测当前页面是否已经检测过文本
             if self.page_num not in self.page_text_boxes:
                 img = np.frombuffer(pix.samples, np.uint8).reshape(pix.h, pix.w, pix.n)
+                # 检测文本，将检测出的文本和矩形框坐标保存到字典中
                 self.page_text_boxes[self.page_num] = self.detect_text(img)
 
             img = QImage(pix.samples, pix.width, pix.height, pix.stride, QImage.Format_RGB888)
