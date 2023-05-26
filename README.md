@@ -1,5 +1,5 @@
 # GlennPDF
-深渊巨坑：基于 pyqt 的简约 pdf 阅读器
+深渊巨坑：基于 pyqt 和 PyMuPDF 的简约 pdf 阅读器
 
 * 2023-05-24 08:26:01 updata main.py：PDF 文件打开，显示，翻页，滚动条等基本功能
 * 2023-05-24 15:48:36 updata main.py：搜索功能
@@ -22,4 +22,8 @@ todo：
 3. 安装 pytesseract：
 ```
 pip install pytesseract
+```
+> PyMuPDF 安装：
+```
+pip install PyMuPDF
 ```
